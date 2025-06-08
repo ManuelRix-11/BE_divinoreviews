@@ -80,12 +80,12 @@ export class Review{
 
 const ReviewSchema = new mongoose.Schema({
     _id: String,
-    _taster_twitterID: String,
-    _taster_name: String,
-    _wineTitle: String,
-    _wineVariety: String,
-    _winery: String,
-    _points: Number,
+    _taster_twitterID: {type: String, required: false},
+    _taster_name:  {type: String, required: true},
+    _wineTitle:  {type: String, required: true},
+    _wineVariety:  {type: String, required: true},
+    _winery:  {type: String, required: true},
+    _points:  {type: Number, required: true},
 });
 
 export const ReviewModel = mongoose.model("Review", ReviewSchema);
