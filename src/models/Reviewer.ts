@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export class Reviewer{
     private _id?: string;
     private _twitterID: string;
@@ -34,3 +36,12 @@ export class Reviewer{
         this._id = value;
     }
 }
+
+const ReviewerSchema = new mongoose.Schema({
+     _id: String,
+     _twitterID: String,
+     _name: String
+
+});
+
+export const ReviewModel = mongoose.model("Review", ReviewerSchema);

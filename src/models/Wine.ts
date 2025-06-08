@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export class Wine{
     private _id?: string;
     private _title: string;
@@ -115,3 +117,20 @@ export class Wine{
         this._price = value;
     }
 }
+
+const WineSchema = new mongoose.Schema({
+    _id: String,
+    _title: String,
+    _variety: String,
+    _winery: String,
+    _country: String,
+    _province: String,
+    _description: String,
+    _region_1: String,
+    _region_2: String,
+    _designation: String,
+    _price: Number
+
+});
+
+export const ReviewModel = mongoose.model("Review", WineSchema);

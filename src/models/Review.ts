@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export class Review{
     private _id?: string;
     private _taster_twitterID: string;
@@ -75,3 +77,15 @@ export class Review{
         this._points = value;
     }
 }
+
+const ReviewSchema = new mongoose.Schema({
+    _id: String,
+    _taster_twitterID: String,
+    _taster_name: String,
+    _wineTitle: String,
+    _wineVariety: String,
+    _winery: String,
+    _points: Number,
+});
+
+export const ReviewModel = mongoose.model("Review", ReviewSchema);
