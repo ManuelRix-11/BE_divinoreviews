@@ -40,8 +40,8 @@ export class Reviewer{
 const ReviewerSchema = new mongoose.Schema({
      _id: String,
      _twitterID: String,
-     _name: String
+     _name: {type: String, required: true}
 
 });
 
-export const ReviewModel = mongoose.model("Review", ReviewerSchema);
+export const ReviewerModel = mongoose.model("Review", ReviewerSchema);

@@ -120,12 +120,12 @@ export class Wine{
 
 const WineSchema = new mongoose.Schema({
     _id: String,
-    _title: String,
-    _variety: String,
-    _winery: String,
-    _country: String,
-    _province: String,
-    _description: String,
+    _title: {type: String, required: true},
+    _variety: {type: String, required: true},
+    _winery: {type: String, required: true},
+    _country: {type: String, required: true},
+    _province: {type: String, required: true},
+    _description: {type: String, required: true},
     _region_1: String,
     _region_2: String,
     _designation: String,
@@ -133,4 +133,4 @@ const WineSchema = new mongoose.Schema({
 
 });
 
-export const ReviewModel = mongoose.model("Review", WineSchema);
+export const WineModel = mongoose.model("Review", WineSchema);
