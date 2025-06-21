@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export class Wine{
+export class Wine {
     private _id?: string;
     private _title: string;
     private _variety: string;
@@ -13,26 +13,35 @@ export class Wine{
     private _designation: string;
     private _price: number;
 
-
-    constructor(title: string, variety: string, winery: string, country: string, province: string, descriptio: string, region_1: string, region_2: string, designation: string, price: number,id?: string) {
+    constructor(
+        title: string,
+        variety: string,
+        winery: string,
+        country: string,
+        province: string,
+        description: string,
+        region_1: string,
+        region_2: string,
+        designation: string,
+        price: number,
+        id?: string
+    ) {
         this._id = id;
         this._title = title;
         this._variety = variety;
         this._winery = winery;
         this._country = country;
         this._province = province;
-        this._description = descriptio;
+        this._description = description;
         this._region_1 = region_1;
         this._region_2 = region_2;
         this._designation = designation;
         this._price = price;
     }
 
-
     get id(): string | undefined {
         return this._id;
     }
-
     set id(value: string | undefined) {
         this._id = value;
     }
@@ -40,7 +49,6 @@ export class Wine{
     get title(): string {
         return this._title;
     }
-
     set title(value: string) {
         this._title = value;
     }
@@ -48,7 +56,6 @@ export class Wine{
     get variety(): string {
         return this._variety;
     }
-
     set variety(value: string) {
         this._variety = value;
     }
@@ -56,7 +63,6 @@ export class Wine{
     get winery(): string {
         return this._winery;
     }
-
     set winery(value: string) {
         this._winery = value;
     }
@@ -64,7 +70,6 @@ export class Wine{
     get country(): string {
         return this._country;
     }
-
     set country(value: string) {
         this._country = value;
     }
@@ -72,7 +77,6 @@ export class Wine{
     get province(): string {
         return this._province;
     }
-
     set province(value: string) {
         this._province = value;
     }
@@ -80,7 +84,6 @@ export class Wine{
     get description(): string {
         return this._description;
     }
-
     set description(value: string) {
         this._description = value;
     }
@@ -88,7 +91,6 @@ export class Wine{
     get region_1(): string {
         return this._region_1;
     }
-
     set region_1(value: string) {
         this._region_1 = value;
     }
@@ -96,7 +98,6 @@ export class Wine{
     get region_2(): string {
         return this._region_2;
     }
-
     set region_2(value: string) {
         this._region_2 = value;
     }
@@ -104,7 +105,6 @@ export class Wine{
     get designation(): string {
         return this._designation;
     }
-
     set designation(value: string) {
         this._designation = value;
     }
@@ -112,7 +112,6 @@ export class Wine{
     get price(): number {
         return this._price;
     }
-
     set price(value: number) {
         this._price = value;
     }
@@ -120,17 +119,16 @@ export class Wine{
 
 const WineSchema = new mongoose.Schema({
     _id: String,
-    _title: String,
-    _variety: String,
-    _winery: String,
-    _country: String,
-    _province: String,
-    _description: String,
-    _region_1: String,
-    _region_2: String,
-    _designation: String,
-    _price: Number
-
+    _title: { type: String, required: true },
+    _variety: { type: String, required: true },
+    _winery: { type: String, required: true },
+    _country: { type: String, required: true },
+    _province: { type: String, required: true },
+    _description: { type: String, required: true },
+    _region_1: { type: String, required: true },
+    _region_2: { type: String, required: true },
+    _designation: { type: String, required: true },
+    _price: { type: Number, required: true },
 });
 
-export const ReviewModel = mongoose.model("Review", WineSchema);
+export const WineModel = mongoose.model("Wine", WineSchema);

@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 
-export class Reviewer{
+export class Reviewer {
     private _id?: string;
     private _twitterID: string;
     private _name: string;
-
 
     constructor(twitterID: string, name: string, id?: string) {
         this._id = id;
@@ -38,10 +37,9 @@ export class Reviewer{
 }
 
 const ReviewerSchema = new mongoose.Schema({
-     _id: String,
-     _twitterID: String,
-     _name: String
-
+    _id: String,
+    _twitterID: { type: String, required: true },
+    _name: { type: String, required: true }
 });
 
-export const ReviewModel = mongoose.model("Review", ReviewerSchema);
+export const ReviewerModel = mongoose.model("Reviewer", ReviewerSchema);
