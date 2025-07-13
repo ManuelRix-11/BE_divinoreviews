@@ -62,6 +62,15 @@ export class Review {
     }) {
         this._wine = value;
     }
+
+    toJSON() {
+        return {
+            id: this._id,
+            points: this._points,
+            taster: this._taster.toJSON(),
+            wine: this._wine
+        };
+    }
 }
 
 const ReviewSchema = new mongoose.Schema({

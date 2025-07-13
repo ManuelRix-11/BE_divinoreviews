@@ -1,5 +1,6 @@
-import { ReviewModel, Review } from "../models/Review";
+import { ReviewModel } from "../models/Review";
 import { Reviewer } from "../models/Reviewer";
+import { Review } from "../models/Review";
 
 export class ReviewService {
     async createRecensione(recensioneData: {
@@ -15,7 +16,17 @@ export class ReviewService {
         };
     }): Promise<Review> {
         try {
-            const newRecensione = new ReviewModel(recensioneData);
+            const reviewer = new Reviewer(
+                recensioneData.taster.taster_twitter_handle,
+                recensioneData.taster.taster_name
+            );
+
+            const newRecensione = new ReviewModel({
+                points: recensioneData.points,
+                taster: reviewer.toObject(),
+                wine: recensioneData.wine
+            });
+
             const savedRecensione = await newRecensione.save();
 
             if (!savedRecensione.wine) {

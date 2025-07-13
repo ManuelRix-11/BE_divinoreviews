@@ -34,6 +34,22 @@ export class Reviewer {
     set id(value: string | undefined) {
         this._id = value;
     }
+
+    toObject() {
+        return {
+            taster_name: this._taster_name,
+            taster_twitter_handle: this._taster_twitter_handle
+        };
+    }
+
+    toJSON() {
+        return {
+            id: this._id,
+            taster_name: this._taster_name,
+            taster_twitter_handle: this._taster_twitter_handle
+        };
+    }
+
 }
 
 export const ReviewerSchema = new mongoose.Schema({
