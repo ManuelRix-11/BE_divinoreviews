@@ -1,47 +1,36 @@
-import { Router, Request, Response } from "express";
-import { Reviewer } from "../models/Reviewer";
-import { ReviewerService } from "../services/ReviewerService";
+import express, { Router, Request, Response } from 'express';
+import { ReviewerController } from '../controller/reviewerController';
 
 const router = Router();
-const reviewerService = new ReviewerService();
+const reviewerController = new ReviewerController();
 
 /**
  * @swagger
  * tags:
  *   name: Reviewers
- *   description: API per gestire i recensori
+ *   description: API per la gestione dei recensori
  */
 
 /**
  * @swagger
  * /reviewers:
  *   get:
- *     summary: Ottieni tutti i recensori
+ *     summary: Ottiene tutti i recensori
  *     tags: [Reviewers]
  *     responses:
  *       200:
- *         description: Lista di recensori
+ *         description: Lista dei recensori
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Reviewer'
- */
-router.get("/", async (req: Request, res: Response) => {
-    try {
-        const reviewers = await reviewerService.getAll();
-        res.json(reviewers);
-    } catch (error) {
-        res.status(500).json({ message: "Errore nel recupero dei recensori" });
-    }
-});
-
-/**
- * @swagger
- * /reviewers:
+ *       500:
+ *         description: Errore del server
+ *
  *   post:
- *     summary: Crea un nuovo recensore
+ *     summary: Aggiunge un nuovo recensore
  *     tags: [Reviewers]
  *     requestBody:
  *       required: true
@@ -52,27 +41,84 @@ router.get("/", async (req: Request, res: Response) => {
  *     responses:
  *       201:
  *         description: Recensore creato
+ *       400:
+ *         description: Dati non validi
+ */
+router.get('/', reviewerController.getAll.bind(reviewerController));
+router.post('/', reviewerController.add.bind(reviewerController));
+
+// @ts-ignore
+/**
+ * @swagger
+ * /reviewers/{id}:
+ *   get:
+ *     summary: Ottiene un recensore per ID
+ *     tags: [Reviewers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Recensore trovato
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Reviewer'
+ *       404:
+ *         description: Recensore non trovato
+ *       500:
+ *         description: Errore del server
+ *
+ *   put:
+ *     summary: Aggiorna un recensore esistente
+ *     tags: [Reviewers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ReviewerInput'
+ *     responses:
+ *       200:
+ *         description: Recensore aggiornato
  *       400:
- *         description: Dati di input non validi
+ *         description: Dati non validi
+ *       404:
+ *         description: Recensore non trovato
+ *
+ *   delete:
+ *     summary: Elimina un recensore
+ *     tags: [Reviewers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       204:
+ *         description: Recensore eliminato
+ *       404:
+ *         description: Recensore non trovato
+ *       500:
+ *         description: Errore del server
  */
-router.post("/", async (req: Request, res: Response) => {
-    try {
-        const reviewer = new Reviewer(
-            req.body._twitterID,
-            req.body._name
-        );
-        const createdReviewer = await reviewerService.add(reviewer);
-        res.status(201).json(createdReviewer);
-    } catch (error) {
-        res.status(400).json({ message: "Errore nella creazione del recensore" });
-    }
-});
 
-export default router;
+// @ts-ignore
+router.get('/:id', reviewerController.getById.bind(reviewerController));
+// @ts-ignore
+router.put('/:id', reviewerController.update.bind(reviewerController));
+// @ts-ignore
+router.delete('/:id', reviewerController.delete.bind(reviewerController));
 
 /**
  * @swagger
@@ -83,24 +129,21 @@ export default router;
  *       properties:
  *         _id:
  *           type: string
- *           description: ID univoco del recensore
- *         _twitterID:
+ *         taster_twitter_handle:
  *           type: string
- *           description: Twitter ID del recensore
- *         _name:
+ *         taster_name:
  *           type: string
- *           description: Nome del recensore
- *       required:
- *         - _twitterID
- *         - _name
  *     ReviewerInput:
  *       type: object
- *       properties:
- *         _twitterID:
- *           type: string
- *         _name:
- *           type: string
  *       required:
- *         - _twitterID
- *         - _name
+ *         - taster_twitter_handle
+ *         - taster_name
+ *       properties:
+ *         taster_twitter_handle:
+ *           type: string
+ *         taster_name:
+ *           type: string
  */
+
+
+export default router;

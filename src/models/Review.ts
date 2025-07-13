@@ -1,91 +1,77 @@
 import mongoose from "mongoose";
+import {Reviewer, ReviewerModel, ReviewerSchema} from "./Reviewer";
 
-export class Review{
+export class Review {
     private _id?: string;
-    private _taster_twitterID: string;
-    private _taster_name: string;
-    private _wineTitle: string;
-    private _wineVariety: string;
-    private _winery: string;
     private _points: number;
+    private _taster: Reviewer;
+    private _wine: {
+        title: string;
+        variety: string;
+        winery: string;
+    };
 
-
-    constructor(taster_twitterID: string, taster_name: string, wineTitle: string, wineVariety: string, winery: string, points: number, id?: string) {
+    constructor(
+        points: number,
+        taster: Reviewer,
+        wine: {
+            title: string;
+            variety: string;
+            winery: string;
+        },
+        id?: string
+    ) {
         this._id = id;
-        this._taster_twitterID = taster_twitterID;
-        this._taster_name = taster_name;
-        this._wineTitle = wineTitle;
-        this._wineVariety = wineVariety;
-        this._winery = winery;
         this._points = points;
+        this._taster = taster;
+        this._wine = wine;
     }
-
 
     get id(): string | undefined {
         return this._id;
     }
-
     set id(value: string | undefined) {
         this._id = value;
-    }
-
-    get taster_twitterID(): string {
-        return this._taster_twitterID;
-    }
-
-    set taster_twitterID(value: string) {
-        this._taster_twitterID = value;
-    }
-
-    get taster_name(): string {
-        return this._taster_name;
-    }
-
-    set taster_name(value: string) {
-        this._taster_name = value;
-    }
-
-    get wineTitle(): string {
-        return this._wineTitle;
-    }
-
-    set wineTitle(value: string) {
-        this._wineTitle = value;
-    }
-
-    get wineVariety(): string {
-        return this._wineVariety;
-    }
-
-    set wineVariety(value: string) {
-        this._wineVariety = value;
-    }
-
-    get winery(): string {
-        return this._winery;
-    }
-
-    set winery(value: string) {
-        this._winery = value;
     }
 
     get points(): number {
         return this._points;
     }
-
     set points(value: number) {
         this._points = value;
+    }
+
+    get taster(): Reviewer {
+        return this._taster;
+    }
+    set taster(value: Reviewer) {
+        this._taster = value;
+    }
+
+    get wine(): {
+        title: string;
+        variety: string;
+        winery: string;
+    } {
+        return this._wine;
+    }
+    set wine(value: {
+        title: string;
+        variety: string;
+        winery: string;
+    }) {
+        this._wine = value;
     }
 }
 
 const ReviewSchema = new mongoose.Schema({
-    _id: String,
-    _taster_twitterID: {type: String, required: false},
-    _taster_name:  {type: String, required: true},
-    _wineTitle:  {type: String, required: true},
-    _wineVariety:  {type: String, required: true},
-    _winery:  {type: String, required: true},
-    _points:  {type: Number, required: true},
+    points: { type: Number, required: true },
+    taster: { type: ReviewerSchema, required: true },
+    wine: {
+        title: { type: String, required: true },
+        variety: { type: String, required: true },
+        winery: { type: String, required: true }
+    }
 });
 
-export const ReviewModel = mongoose.model("Review", ReviewSchema);
+export const ReviewModel = mongoose.model("Recensioni", ReviewSchema, "Recensioni");

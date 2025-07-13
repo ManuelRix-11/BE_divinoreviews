@@ -1,47 +1,47 @@
-import { Router, Request, Response } from "express";
-import { Wine } from "../models/Wine";
-import { WineService } from "../services/WineService";
+import { Router } from 'express';
+import { WineController } from '../controller/wineController';
 
 const router = Router();
-const wineService = new WineService();
+const wineController = new WineController();
 
 /**
  * @swagger
  * tags:
  *   name: Wines
- *   description: API per gestire i vini
+ *   description: API per la gestione dei vini
  */
 
 /**
  * @swagger
  * /wines:
  *   get:
- *     summary: Ottieni tutti i vini
+ *     summary: Ottiene tutti i vini con paginazione
  *     tags: [Wines]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Numero della pagina
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Numero di elementi per pagina
  *     responses:
  *       200:
- *         description: Lista di vini
+ *         description: Lista dei vini
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Wine'
- */
-router.get("/", async (req: Request, res: Response) => {
-    try {
-        const wines = await wineService.getAll();
-        res.json(wines);
-    } catch (error) {
-        res.status(500).json({ message: "Errore nel recupero dei vini" });
-    }
-});
-
-/**
- * @swagger
- * /wines:
+ *       500:
+ *         description: Errore del server
+ *
  *   post:
- *     summary: Crea un nuovo vino
+ *     summary: Aggiunge un nuovo vino
  *     tags: [Wines]
  *     requestBody:
  *       required: true
@@ -51,33 +51,96 @@ router.get("/", async (req: Request, res: Response) => {
  *             $ref: '#/components/schemas/WineInput'
  *     responses:
  *       201:
- *         description: Vino creato
+ *         description: Vino creato con successo
+ *       400:
+ *         description: Richiesta non valida
+ *       500:
+ *         description: Errore del server
+ */
+router.get('/', async (req, res) => {
+    await wineController.getAll(req, res);
+});
+
+router.post('/', async (req, res) => {
+    await wineController.add(req, res);
+});
+
+/**
+ * @swagger
+ * /wines/{id}:
+ *   get:
+ *     summary: Ottiene un vino tramite ID
+ *     tags: [Wines]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Dettagli del vino
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Wine'
+ *       404:
+ *         description: Vino non trovato
+ *       500:
+ *         description: Errore del server
+ *
+ *   put:
+ *     summary: Aggiorna un vino esistente
+ *     tags: [Wines]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/WineInput'
+ *     responses:
+ *       200:
+ *         description: Vino aggiornato con successo
  *       400:
- *         description: Dati di input non validi
+ *         description: Richiesta non valida
+ *       404:
+ *         description: Vino non trovato
+ *       500:
+ *         description: Errore del server
+ *
+ *   delete:
+ *     summary: Elimina un vino
+ *     tags: [Wines]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Vino eliminato con successo
+ *       404:
+ *         description: Vino non trovato
+ *       500:
+ *         description: Errore del server
  */
-router.post("/", async (req: Request, res: Response) => {
-    try {
-        const wine = new Wine(
-            req.body._title,
-            req.body._variety,
-            req.body._winery,
-            req.body._country,
-            req.body._province,
-            req.body._description,
-            req.body._region_1,
-            req.body._region_2,
-            req.body._designation,
-            req.body._price
-        );
-        const createdWine = await wineService.add(wine);
-        res.status(201).json(createdWine);
-    } catch (error) {
-        res.status(400).json({ message: "Errore nella creazione del vino" });
-    }
+router.get('/:id', async (req, res) => {
+    await wineController.getById(req, res);
+});
+
+router.put('/:id', async (req, res) => {
+    await wineController.update(req, res);
+});
+
+router.delete('/:id', async (req, res) => {
+    await wineController.delete(req, res);
 });
 
 export default router;
@@ -91,80 +154,35 @@ export default router;
  *       properties:
  *         _id:
  *           type: string
- *           description: ID univoco del vino
- *         _title:
+ *         title:
  *           type: string
- *           description: Titolo del vino
- *         _variety:
+ *         variety:
  *           type: string
- *           description: Varietà del vino
- *         _winery:
+ *         winery:
  *           type: string
- *           description: Cantina
- *         _country:
+ *         points:
+ *           type: integer
+ *         taster_name:
  *           type: string
- *           description: Paese di origine
- *         _province:
+ *         taster_twitterID:
  *           type: string
- *           description: Provincia
- *         _description:
- *           type: string
- *           description: Descrizione del vino
- *         _region_1:
- *           type: string
- *           description: Regione 1
- *         _region_2:
- *           type: string
- *           description: Regione 2
- *         _designation:
- *           type: string
- *           description: Designazione
- *         _price:
- *           type: number
- *           description: Prezzo
- *       required:
- *         - _title
- *         - _variety
- *         - _winery
- *         - _country
- *         - _province
- *         - _description
- *         - _region_1
- *         - _region_2
- *         - _designation
- *         - _price
  *     WineInput:
  *       type: object
- *       properties:
- *         _title:
- *           type: string
- *         _variety:
- *           type: string
- *         _winery:
- *           type: string
- *         _country:
- *           type: string
- *         _province:
- *           type: string
- *         _description:
- *           type: string
- *         _region_1:
- *           type: string
- *         _region_2:
- *           type: string
- *         _designation:
- *           type: string
- *         _price:
- *           type: number
  *       required:
- *         - _title
- *         - _variety
- *         - _winery
- *         - _country
- *         - _province
- *         - _description
- *         - _region_1
- *         - _region_2
- *         - _designation
- *         - _price
+ *         - title
+ *         - variety
+ *         - winery
+ *       properties:
+ *         title:
+ *           type: string
+ *         variety:
+ *           type: string
+ *         winery:
+ *           type: string
+ *         points:
+ *           type: integer
+ *         taster_name:
+ *           type: string
+ *         taster_twitterID:
+ *           type: string
  */

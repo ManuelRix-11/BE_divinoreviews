@@ -14,16 +14,16 @@ export class Wine {
     private _price: number;
 
     constructor(
+        country: string,
+        description: string,
+        designation: string,
+        price: number,
+        province: string,
+        region_1: string,
+        region_2: string,
         title: string,
         variety: string,
         winery: string,
-        country: string,
-        province: string,
-        description: string,
-        region_1: string,
-        region_2: string,
-        designation: string,
-        price: number,
         id?: string
     ) {
         this._id = id;
@@ -118,17 +118,16 @@ export class Wine {
 }
 
 const WineSchema = new mongoose.Schema({
-    _id: String,
-    _title: { type: String, required: true },
-    _variety: { type: String, required: true },
-    _winery: { type: String, required: true },
-    _country: { type: String, required: true },
-    _province: { type: String, required: true },
-    _description: { type: String, required: true },
-    _region_1: { type: String, required: true },
-    _region_2: { type: String, required: true },
-    _designation: { type: String, required: true },
-    _price: { type: Number, required: true },
+    country: { type: String, required: true },
+    description: { type: String, required: true },
+    designation: { type: String, required: true },
+    price: { type: Number, required: true },
+    province: { type: String, required: true },
+    region_1: { type: String, required: true },
+    region_2: { type: String, required: true },
+    title: { type: String, required: true },
+    variety: { type: String, required: true },
+    winery: { type: String, required: true }
 });
 
-export const WineModel = mongoose.model("Wine", WineSchema);
+export const WineModel = mongoose.model("Vinoh", WineSchema, "Vinoh");
