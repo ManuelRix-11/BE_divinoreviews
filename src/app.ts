@@ -1,7 +1,6 @@
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger';
-import reviewerRoutes from "./routes/ReviewerRoutes";
 import wineRoutes from "./routes/WineRoutes";
 import reviewRoutes from "./routes/ReviewRoutes";
 
@@ -15,7 +14,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use('/reviewers', reviewerRoutes);
 app.use('/wines', wineRoutes);
 app.use('/review', reviewRoutes);
 

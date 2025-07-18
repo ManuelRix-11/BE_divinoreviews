@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
-import {Reviewer, ReviewerModel, ReviewerSchema} from "./Reviewer";
 
 export class Review {
     private _id?: string;
     private _points: number;
-    private _taster: Reviewer;
+    private _taster: {
+        taster_name: string;
+        taster_twitter_handle: string;
+    };
     private _wine: {
         title: string;
         variety: string;
@@ -13,7 +15,10 @@ export class Review {
 
     constructor(
         points: number,
-        taster: Reviewer,
+        taster: {
+            taster_name: string;
+            taster_twitter_handle: string;
+        },
         wine: {
             title: string;
             variety: string;
@@ -41,10 +46,16 @@ export class Review {
         this._points = value;
     }
 
-    get taster(): Reviewer {
+    get taster(): {
+        taster_name: string;
+        taster_twitter_handle: string;
+    } {
         return this._taster;
     }
-    set taster(value: Reviewer) {
+    set taster(value: {
+        taster_name: string;
+        taster_twitter_handle: string;
+    }) {
         this._taster = value;
     }
 
@@ -62,20 +73,14 @@ export class Review {
     }) {
         this._wine = value;
     }
-
-    toJSON() {
-        return {
-            id: this._id,
-            points: this._points,
-            taster: this._taster.toJSON(),
-            wine: this._wine
-        };
-    }
 }
 
 const ReviewSchema = new mongoose.Schema({
     points: { type: Number, required: true },
-    taster: { type: ReviewerSchema, required: true },
+    taster: {
+        taster_name: { type: String, required: true },
+        taster_twitter_handle: { type: String, required: true }
+    },
     wine: {
         title: { type: String, required: true },
         variety: { type: String, required: true },

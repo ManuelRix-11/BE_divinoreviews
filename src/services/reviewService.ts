@@ -1,5 +1,4 @@
 import { ReviewModel } from "../models/Review";
-import { Reviewer } from "../models/Reviewer";
 import { Review } from "../models/Review";
 
 export class ReviewService {
@@ -16,32 +15,32 @@ export class ReviewService {
         };
     }): Promise<Review> {
         try {
-            const reviewer = new Reviewer(
-                recensioneData.taster.taster_twitter_handle,
-                recensioneData.taster.taster_name
-            );
-
             const newRecensione = new ReviewModel({
                 points: recensioneData.points,
-                taster: reviewer.toObject(),
-                wine: recensioneData.wine
+                taster: {
+                    taster_name: recensioneData.taster.taster_name,
+                    taster_twitter_handle: recensioneData.taster.taster_twitter_handle
+                },
+                wine: {
+                    title: recensioneData.wine.title,
+                    variety: recensioneData.wine.variety,
+                    winery: recensioneData.wine.winery
+                }
             });
 
             const savedRecensione = await newRecensione.save();
 
-            if (!savedRecensione.wine) {
-                throw new Error('Dati del vino mancanti nella recensione salvata');
-            }
-
-            const taster = new Reviewer(
-                savedRecensione.taster.taster_twitter_handle,
-                savedRecensione.taster.taster_name
-            );
-
             return new Review(
                 savedRecensione.points,
-                taster,
-                savedRecensione.wine,
+                {
+                    taster_name: savedRecensione.taster?.taster_name!,
+                    taster_twitter_handle: savedRecensione.taster?.taster_twitter_handle!
+                },
+                {
+                    title: savedRecensione.wine?.title!,
+                    variety: savedRecensione.wine?.variety!,
+                    winery: savedRecensione.wine?.winery!
+                },
                 savedRecensione._id?.toString()
             );
         } catch (error) {
@@ -53,14 +52,20 @@ export class ReviewService {
         try {
             const skip = (page - 1) * limit;
             const recensioni = await ReviewModel.find().skip(skip).limit(limit);
-            return recensioni
-                .filter(rec => rec.wine)
-                .map(rec => new Review(
-                    rec.points,
-                    new Reviewer(rec.taster.taster_twitter_handle, rec.taster.taster_name),
-                    rec.wine!,
-                    rec._id?.toString()
-                ));
+
+            return recensioni.map(rec => new Review(
+                rec.points,
+                {
+                    taster_name: rec.taster?.taster_name!,
+                    taster_twitter_handle: rec.taster?.taster_twitter_handle!
+                },
+                {
+                    title: rec.wine?.title!,
+                    variety: rec.wine?.variety!,
+                    winery: rec.wine?.winery!
+                },
+                rec._id?.toString()
+            ));
         } catch (error) {
             throw new Error(`Errore nel recupero delle recensioni: ${error}`);
         }
@@ -71,19 +76,17 @@ export class ReviewService {
             const recensione = await ReviewModel.findById(id);
             if (!recensione) return null;
 
-            if (!recensione.wine) {
-                throw new Error('Dati del vino mancanti nella recensione');
-            }
-
-            const taster = new Reviewer(
-                recensione.taster.taster_twitter_handle,
-                recensione.taster.taster_name
-            );
-
             return new Review(
                 recensione.points,
-                taster,
-                recensione.wine,
+                {
+                    taster_name: recensione.taster?.taster_name!,
+                    taster_twitter_handle: recensione.taster?.taster_twitter_handle!
+                },
+                {
+                    title: recensione.wine?.title!,
+                    variety: recensione.wine?.variety!,
+                    winery: recensione.wine?.winery!
+                },
                 recensione._id?.toString()
             );
         } catch (error) {
@@ -107,19 +110,17 @@ export class ReviewService {
             const updatedRecensione = await ReviewModel.findByIdAndUpdate(id, updates, { new: true });
             if (!updatedRecensione) return null;
 
-            if (!updatedRecensione.wine) {
-                throw new Error('Dati del vino mancanti nella recensione aggiornata');
-            }
-
-            const taster = new Reviewer(
-                updatedRecensione.taster.taster_twitter_handle,
-                updatedRecensione.taster.taster_name
-            );
-
             return new Review(
                 updatedRecensione.points,
-                taster,
-                updatedRecensione.wine,
+                {
+                    taster_name: updatedRecensione.taster?.taster_name!,
+                    taster_twitter_handle: updatedRecensione.taster?.taster_twitter_handle!
+                },
+                {
+                    title: updatedRecensione.wine?.title!,
+                    variety: updatedRecensione.wine?.variety!,
+                    winery: updatedRecensione.wine?.winery!
+                },
                 updatedRecensione._id?.toString()
             );
         } catch (error) {
@@ -140,14 +141,20 @@ export class ReviewService {
         try {
             const skip = (page - 1) * limit;
             const recensioni = await ReviewModel.find({ "wine.winery": winery }).skip(skip).limit(limit);
-            return recensioni
-                .filter(rec => rec.wine)
-                .map(rec => new Review(
-                    rec.points,
-                    new Reviewer(rec.taster.taster_twitter_handle, rec.taster.taster_name),
-                    rec.wine!,
-                    rec._id?.toString()
-                ));
+
+            return recensioni.map(rec => new Review(
+                rec.points,
+                {
+                    taster_name: rec.taster?.taster_name!,
+                    taster_twitter_handle: rec.taster?.taster_twitter_handle!
+                },
+                {
+                    title: rec.wine?.title!,
+                    variety: rec.wine?.variety!,
+                    winery: rec.wine?.winery!
+                },
+                rec._id?.toString()
+            ));
         } catch (error) {
             throw new Error(`Errore nel recupero delle recensioni per winery: ${error}`);
         }
@@ -157,14 +164,20 @@ export class ReviewService {
         try {
             const skip = (page - 1) * limit;
             const recensioni = await ReviewModel.find({ "taster.taster_name": tasterName }).skip(skip).limit(limit);
-            return recensioni
-                .filter(rec => rec.wine)
-                .map(rec => new Review(
-                    rec.points,
-                    new Reviewer(rec.taster.taster_twitter_handle, rec.taster.taster_name),
-                    rec.wine!,
-                    rec._id?.toString()
-                ));
+
+            return recensioni.map(rec => new Review(
+                rec.points,
+                {
+                    taster_name: rec.taster?.taster_name!,
+                    taster_twitter_handle: rec.taster?.taster_twitter_handle!
+                },
+                {
+                    title: rec.wine?.title!,
+                    variety: rec.wine?.variety!,
+                    winery: rec.wine?.winery!
+                },
+                rec._id?.toString()
+            ));
         } catch (error) {
             throw new Error(`Errore nel recupero delle recensioni per taster: ${error}`);
         }
@@ -177,14 +190,19 @@ export class ReviewService {
                 points: { $gte: minPoints, $lte: maxPoints }
             }).skip(skip).limit(limit);
 
-            return recensioni
-                .filter(rec => rec.wine)
-                .map(rec => new Review(
-                    rec.points,
-                    new Reviewer(rec.taster.taster_twitter_handle, rec.taster.taster_name),
-                    rec.wine!,
-                    rec._id?.toString()
-                ));
+            return recensioni.map(rec => new Review(
+                rec.points,
+                {
+                    taster_name: rec.taster?.taster_name!,
+                    taster_twitter_handle: rec.taster?.taster_twitter_handle!
+                },
+                {
+                    title: rec.wine?.title!,
+                    variety: rec.wine?.variety!,
+                    winery: rec.wine?.winery!
+                },
+                rec._id?.toString()
+            ));
         } catch (error) {
             throw new Error(`Errore nel recupero delle recensioni per range di punti: ${error}`);
         }
