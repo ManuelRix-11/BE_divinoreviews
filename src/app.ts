@@ -3,10 +3,17 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger';
 import wineRoutes from "./routes/WineRoutes";
 import reviewRoutes from "./routes/ReviewRoutes";
+import cors from 'cors'; 
 
 const app = express();
 
 app.use(express.json());
+
+// ABILITA CORS per tutte le richieste
+app.use(cors({
+  origin: '*', 
+  methods: ['GET', 'POST', 'DELETE', 'PUT'],
+}));
 
 app.use((req, res, next) => {
     console.log(`[${req.method}] - ${res.statusCode}  ${req.originalUrl}`);
