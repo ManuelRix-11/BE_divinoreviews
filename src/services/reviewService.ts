@@ -266,4 +266,138 @@ export class ReviewService {
             }
         };
     }
+    async getRecensioniByVariety(variety: string, page = 1, limit = 15) {
+        try {
+            const skip = (page - 1) * limit;
+
+            // Costruzione delle regex per filtrare i titoli in base alla varietà
+            let regexConditions: any[] = [];
+
+            switch (variety.toLowerCase()) {
+            case 'red':
+                regexConditions = [
+                { "wine.title": { $regex: /red/i } },
+                { "wine.title": { $regex: /rosso/i } }
+                ];
+                break;
+            case 'white':
+                regexConditions = [
+                { "wine.title": { $regex: /white/i } },
+                { "wine.title": { $regex: /bianco/i } }
+                ];
+                break;
+            case 'rose':
+            case 'rosé':
+                regexConditions = [
+                { "wine.title": { $regex: /ros[eè]/i } }
+                ];
+                break;
+            default:
+                throw new Error('Categoria varietà non valida. Usa red, white o rose.');
+            }
+
+            // Aggregation con filtro e join
+            const result = await ReviewModel.aggregate([
+            {
+                $match: {
+                $or: regexConditions
+                }
+            },
+            {
+                $lookup: {
+                from: "Vinoh",
+                let: {
+                    reviewTitle: "$wine.title",
+                    reviewVariety: "$wine.variety",
+                    reviewWinery: "$wine.winery"
+                },
+                pipeline: [
+                    {
+                    $match: {
+                        $expr: {
+                        $and: [
+                            { $eq: ["$title", "$$reviewTitle"] },
+                            { $eq: ["$variety", "$$reviewVariety"] },
+                            { $eq: ["$winery", "$$reviewWinery"] }
+                        ]
+                        }
+                    }
+                    },
+                    {
+                    $project: {
+                        title: 1,
+                        variety: 1,
+                        winery: 1,
+                        country: 1,
+                        province: 1,
+                        region_1: 1,
+                        region_2: 1,
+                        designation: 1,
+                        description: 1,
+                        price: 1
+                    }
+                    }
+                ],
+                as: "wineDetails"
+                }
+            },
+            {
+                $unwind: {
+                path: "$wineDetails",
+                preserveNullAndEmptyArrays: true
+                }
+            },
+            { $skip: skip },
+            { $limit: limit }
+            ]);
+
+            const totalCount = await ReviewModel.countDocuments({ $or: regexConditions });
+            const totalPages = Math.ceil(totalCount / limit);
+
+            const data = result.map(rec => ({
+            _id: rec._id.toString(),
+            points: rec.points,
+            taster: {
+                taster_name: rec.taster?.taster_name || 'N/A',
+                taster_twitter_handle: rec.taster?.taster_twitter_handle || 'N/A'
+            },
+            wine: {
+                _id: rec._id.toString(),
+                title: rec.wine?.title || 'N/A',
+                variety: rec.wine?.variety || 'N/A',
+                winery: rec.wine?.winery || 'N/A'
+            },
+            wineDetails: rec.wineDetails
+                ? {
+                    _id: rec.wineDetails._id?.toString() || '',
+                    title: rec.wineDetails.title,
+                    variety: rec.wineDetails.variety,
+                    winery: rec.wineDetails.winery,
+                    country: rec.wineDetails.country,
+                    province: rec.wineDetails.province,
+                    description: rec.wineDetails.description,
+                    region_1: rec.wineDetails.region_1,
+                    region_2: rec.wineDetails.region_2,
+                    designation: rec.wineDetails.designation,
+                    price: rec.wineDetails.price
+                }
+                : null
+            }));
+
+            return {
+            data,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalCount,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            }
+            };
+        } catch (error) {
+            throw new Error(`Errore nel recupero recensioni con join: ${error}`);
+        }
+    }
+
+
 }
