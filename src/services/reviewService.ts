@@ -231,6 +231,13 @@ export class ReviewService {
                                     ]
                                 }
                             }
+                        },
+                        {
+                            $project: {
+                                title: 0,
+                                variety: 0,
+                                winery: 0
+                            }
                         }
                     ],
                     as: "wineDetails"
@@ -239,18 +246,13 @@ export class ReviewService {
             {
                 $unwind: {
                     path: "$wineDetails",
-                    preserveNullAndEmptyArrays: true // Mantiene le recensioni anche se non trova il vino
+                    preserveNullAndEmptyArrays: true
                 }
             },
-            {
-                $skip: skip
-            },
-            {
-                $limit: limit
-            }
+            { $skip: skip },
+            { $limit: limit }
         ]);
 
-        // Conta il totale per la paginazione
         const totalCount = await ReviewModel.countDocuments();
 
         return {

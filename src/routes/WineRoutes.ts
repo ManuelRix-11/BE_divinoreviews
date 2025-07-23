@@ -160,12 +160,6 @@ export default router;
  *           type: string
  *         winery:
  *           type: string
- *         points:
- *           type: integer
- *         taster_name:
- *           type: string
- *         taster_twitterID:
- *           type: string
  *     WineInput:
  *       type: object
  *       required:
