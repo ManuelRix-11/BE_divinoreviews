@@ -207,4 +207,61 @@ export class ReviewService {
             throw new Error(`Errore nel recupero delle recensioni per range di punti: ${error}`);
         }
     }
+
+    async getRecensioniAndWine(page: number, limit: number) {
+        const skip = (page - 1) * limit;
+
+        const result = await ReviewModel.aggregate([
+            {
+                $lookup: {
+                    from: "Vinoh", // Nome della collection Wine
+                    let: {
+                        reviewTitle: "$wine.title",
+                        reviewVariety: "$wine.variety",
+                        reviewWinery: "$wine.winery"
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$title", "$$reviewTitle"] },
+                                        { $eq: ["$variety", "$$reviewVariety"] },
+                                        { $eq: ["$winery", "$$reviewWinery"] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "wineDetails"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$wineDetails",
+                    preserveNullAndEmptyArrays: true // Mantiene le recensioni anche se non trova il vino
+                }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
+            }
+        ]);
+
+        // Conta il totale per la paginazione
+        const totalCount = await ReviewModel.countDocuments();
+
+        return {
+            data: result,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / limit),
+                totalCount,
+                hasNextPage: page < Math.ceil(totalCount / limit),
+                hasPrevPage: page > 1
+            }
+        };
+    }
 }

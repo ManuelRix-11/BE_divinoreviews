@@ -380,4 +380,207 @@ router.get("/winery/:winery", recensioneController.getRecensioniByWinery);
  */
 router.get("/taster/:tasterName", recensioneController.getRecensioniByTaster);
 
+/**
+ * @swagger
+ * /review/points:
+ *   get:
+ *     summary: Recupera recensioni filtrate per intervallo di punti con paginazione
+ *     tags: [Recensioni]
+ *     parameters:
+ *       - in: query
+ *         name: minPoints
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           maximum: 100
+ *         description: Punteggio minimo (incluso)
+ *         example: 80
+ *       - in: query
+ *         name: maxPoints
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           maximum: 100
+ *         description: Punteggio massimo (incluso)
+ *         example: 95
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: "Numero della pagina (default: 1)"
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: "Numero di elementi per pagina (default: 10)"
+ *     responses:
+ *       200:
+ *         description: Lista delle recensioni nell'intervallo specificato
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       400:
+ *         description: Parametri non validi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get("/points", recensioneController.getRecensioniByPointsRange);
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     WineDetails:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: ID univoco del vino
+ *         title:
+ *           type: string
+ *           description: Titolo del vino
+ *           example: "Nicosia 2013 Vulkà Bianco (Etna)"
+ *         variety:
+ *           type: string
+ *           description: Varietà del vino
+ *           example: "White Blend"
+ *         winery:
+ *           type: string
+ *           description: Cantina produttrice
+ *           example: "Nicosia"
+ *         country:
+ *           type: string
+ *           description: Paese di origine
+ *           example: "Italy"
+ *         province:
+ *           type: string
+ *           description: Provincia
+ *           example: "Sicily & Sardinia"
+ *         description:
+ *           type: string
+ *           description: Descrizione del vino
+ *           example: "Aromas include tropical fruit, broom, brimstone and dried herb..."
+ *         region_1:
+ *           type: string
+ *           description: Prima regione
+ *           example: "Etna"
+ *         region_2:
+ *           type: string
+ *           description: Seconda regione
+ *           example: ""
+ *         designation:
+ *           type: string
+ *           description: Denominazione
+ *           example: "Vulkà Bianco"
+ *         price:
+ *           type: number
+ *           description: Prezzo del vino
+ *           example: 25.0
+ *
+ *     ReviewWithWine:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: ID univoco della recensione
+ *         points:
+ *           type: number
+ *           minimum: 0
+ *           maximum: 100
+ *           description: Punteggio della recensione
+ *           example: 87
+ *         taster:
+ *           $ref: '#/components/schemas/Reviewer'
+ *         wine:
+ *           $ref: '#/components/schemas/Wine'
+ *         wineDetails:
+ *           $ref: '#/components/schemas/WineDetails'
+ *
+ *     ReviewWithWineResponse:
+ *       type: object
+ *       properties:
+ *         data:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/ReviewWithWine'
+ *         pagination:
+ *           type: object
+ *           properties:
+ *             currentPage:
+ *               type: integer
+ *               description: Pagina corrente
+ *               example: 1
+ *             totalPages:
+ *               type: integer
+ *               description: Numero totale di pagine
+ *               example: 10
+ *             totalCount:
+ *               type: integer
+ *               description: Numero totale di elementi
+ *               example: 100
+ *             hasNextPage:
+ *               type: boolean
+ *               description: Indica se esiste una pagina successiva
+ *               example: true
+ *             hasPrevPage:
+ *               type: boolean
+ *               description: Indica se esiste una pagina precedente
+ *               example: false
+ */
+
+/**
+ * @swagger
+ * /review/with-wine:
+ *   get:
+ *     summary: Recupera tutte le recensioni con le informazioni complete dei vini associati
+ *     tags: [Recensioni]
+ *     description: Esegue una join tra le recensioni e i vini per ottenere informazioni dettagliate sui vini recensiti
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: "Numero della pagina (default: 1)"
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: "Numero di elementi per pagina (default: 10)"
+ *     responses:
+ *       200:
+ *         description: Lista delle recensioni con informazioni complete sui vini
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ReviewWithWineResponse'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get("/with-wine", recensioneController.getRecensioniAndWine);
+
 export default router;

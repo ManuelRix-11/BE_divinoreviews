@@ -139,4 +139,19 @@ export class ReviewController {
             });
         }
     };
+
+    getRecensioniAndWine = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+
+            const recensioniWithWine = await this.recensioneService.getRecensioniAndWine(page, limit);
+            res.status(200).json(recensioniWithWine);
+        } catch (error) {
+            res.status(500).json({
+                error: "Errore nel recupero delle recensioni con informazioni sui vini",
+                details: error instanceof Error ? error.message : "Errore sconosciuto"
+            });
+        }
+    };
 }
