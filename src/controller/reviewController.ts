@@ -139,4 +139,26 @@ export class ReviewController {
             });
         }
     };
+
+    getRecensioniByVariety = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { variety } = req.params;  
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 15;
+
+            if (!variety) {
+                res.status(400).json({ error: "Parametro 'variety' mancante (red, white, rose)" });
+                return;
+            }
+
+            const recensioni = await this.recensioneService.getRecensioniByVariety(variety, page, limit);
+            res.status(200).json(recensioni);
+        } catch (error) {
+            res.status(500).json({
+                error: "Errore nel recupero delle recensioni per varietà",
+                details: error instanceof Error ? error.message : "Errore sconosciuto"
+            });
+        }
+    };
+
 }

@@ -380,4 +380,56 @@ router.get("/winery/:winery", recensioneController.getRecensioniByWinery);
  */
 router.get("/taster/:tasterName", recensioneController.getRecensioniByTaster);
 
+/**
+ * @swagger
+ * /review/variety/{variety}:
+ *   get:
+ *     summary: Recupera tutte le recensioni in base alla varietà (colore) del vino
+ *     tags: [Recensioni]
+ *     parameters:
+ *       - in: path
+ *         name: variety
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [red, white, rose]
+ *         description: Tipo di vino in base al colore (red, white, rose)
+ *         example: red
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Numero della pagina (default 1)
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Numero di elementi per pagina (default 10)
+ *     responses:
+ *       200:
+ *         description: Lista delle recensioni filtrate per colore
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       400:
+ *         description: Parametro 'variety' mancante o non valido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get("/variety/:variety", recensioneController.getRecensioniByVariety);
 export default router;

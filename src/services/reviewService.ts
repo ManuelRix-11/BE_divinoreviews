@@ -189,4 +189,52 @@ export class ReviewService {
             throw new Error(`Errore nel recupero delle recensioni per range di punti: ${error}`);
         }
     }
+
+    async getRecensioniByVariety(variety: string, page = 1, limit = 15): Promise<Review[]> {
+        try {
+            const skip = (page - 1) * limit;
+
+            let regexConditions: any[] = [];
+
+            switch (variety.toLowerCase()) {
+                case 'red':
+                    regexConditions = [
+                        { "wine.title" : { $regex: /red/i } },
+                        { "wine.title" : { $regex: /rosso/i } }
+                    ];
+                    break;
+                case 'white':
+                    regexConditions = [
+                        { "wine.title" : { $regex: /white/i } },
+                        { "wine.title" : { $regex: /bianco/i } }
+                    ];
+                    break;
+                case 'rose':
+                case 'rosé':
+                    regexConditions = [
+                        { "wine.title" : { $regex: /ros[eè]/i } }
+                    ];
+                    break;
+                default:
+                    throw new Error('Categoria varietà non valida. Usa red, white o rose.');
+            }
+
+            const recensioni = await ReviewModel.find({ $or: regexConditions })
+                .skip(skip)
+                .limit(limit);
+
+            return recensioni
+                .filter(rec => rec.wine)
+                .map(rec => new Review(
+                    rec.points,
+                    new Reviewer(rec.taster?.taster_twitter_handle, rec.taster?.taster_name),
+                    rec.wine!,
+                    rec._id?.toString()
+                ));
+
+        } catch (error) {
+            throw new Error(`Errore nel recupero delle recensioni per varietà: ${error}`);
+        }
+    }
+
 }
